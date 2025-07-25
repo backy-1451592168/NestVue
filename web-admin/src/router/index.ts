@@ -37,11 +37,21 @@ const router = createRouter({
           meta: { label: '编辑内容', icon: 'basil:edit-outline', showMenu: true },
           children: [
             {
+              path: 'editHomePage',
+              name: 'management_editHomePage',
+              component: () => import('../views/manage/management/editHomePage.vue'),
+              meta: {
+                label: '编辑首页',
+                icon: 'material-symbols-light:date-range-outline',
+                showMenu: true,
+              },
+            },
+            {
               path: 'editHolidays',
               name: 'management_editHolidays',
               component: () => import('../views/manage/management/editHolidays.vue'),
               meta: {
-                label: '编辑',
+                label: '编辑节假日',
                 icon: 'material-symbols-light:date-range-outline',
                 showMenu: true,
               },

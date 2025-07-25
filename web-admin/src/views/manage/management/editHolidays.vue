@@ -64,10 +64,6 @@ function getList() {
         message.error(res.message || '获取列表失败');
       }
     })
-    .catch((error) => {
-      console.error(error);
-      message.error('请求异常');
-    })
     .finally(() => {
       tableLoading.value = false;
     });
@@ -205,7 +201,7 @@ const columns: DataTableColumns<Holiday> = [
       </n-button>
     </BaseCard>
     <BaseCard>
-      <n-data-table style="height: calc(100dvh - 205px)" flex-height :columns="columns" :data="tableData"
+      <n-data-table style="height: calc(100dvh - 205px)" flex-height striped :columns="columns" :data="tableData"
         :loading="tableLoading" :scroll-x="800" />
       <n-pagination class="!mt-[10px] flex justify-end" :item-count="total" v-model:page="query.page"
         v-model:page-size="query.pageSize" @update:page="onPageChange" @update:page-size="onPageSizeChange"

@@ -1,0 +1,3 @@
+<template>
+  <RichTextEditor></RichTextEditor>
+</template>

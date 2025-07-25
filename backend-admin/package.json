@@ -11,7 +11,8 @@
     "egg-cors": "^3.0.1",
     "egg-mysql": "^5.0.0",
     "egg-scripts": "2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
     "egg-bin": "6",

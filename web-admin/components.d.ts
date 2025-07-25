@@ -39,6 +39,8 @@ declare module 'vue' {
     NSwitch: typeof import('naive-ui')['NSwitch']
     NTooltip: typeof import('naive-ui')['NTooltip']
     NWatermark: typeof import('naive-ui')['NWatermark']
+    RichText: typeof import('./src/components/custom/rich-text.vue')['default']
+    RichTextEditor: typeof import('./src/components/custom/rich-text-editor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SvgIcon: typeof import('./src/components/custom/svg-icon.vue')['default']

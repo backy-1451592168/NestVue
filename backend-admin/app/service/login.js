@@ -77,7 +77,7 @@ class UserService extends Service {
     const token = jwt.sign(
       { data: { userName: user.user_name } },
       jwtSecret,
-      { expiresIn: '1h' } // token 有效期 1 小时
+      { expiresIn: '10s' } // token 有效期 1 小时
     );
     /**
       作用：当 token 过期后，用它来换取新的 token，避免用户频繁重新登录。
@@ -124,7 +124,7 @@ class UserService extends Service {
       const newToken = jwt.sign(
         { data: decoded.data },
         jwtSecret,
-        { expiresIn: '1h' }
+        { expiresIn: '10s' }
       );
       return {
         code: 200,
@@ -156,7 +156,7 @@ class UserService extends Service {
       const user = await app.mysql.get('user_admin', { user_name: userName });
       if (!user) {
         return {
-          code: 404,
+          code: 4001,
           message: '用户不存在',
         };
       }

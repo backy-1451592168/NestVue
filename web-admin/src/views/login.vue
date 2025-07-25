@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useFormRules, useNaiveForm } from '@/utils/common/form.ts';
 import apis from "@/api/login";
 import type { FormItemRule } from 'naive-ui';
+import message from '@/utils/naiveui/message.ts';
 // import { mainStore } from '@/stores';
 
 const router = useRouter();
@@ -16,7 +17,7 @@ interface FormModel {
   password: string;
 }
 const model: FormModel = reactive({
-  userName: 'test2',
+  userName: '',
   password: '123456'
 });
 
@@ -25,9 +26,18 @@ const rules: Record<keyof FormModel, FormItemRule[]> = {
   password: formRules.pwd,
 };
 
+const rememberMe = ref(false);
+// 初始化记住用户名
+const storedUserName = localStorage.getItem('rememberUserName');
+if (storedUserName) {
+  model.userName = storedUserName;
+  rememberMe.value = true;
+}
+
 const { formRef, validate } = useNaiveForm();
 
 const loginLoading = ref(false);
+// 登录
 const handleSubmit = async () => {
   await validate();
   loginLoading.value = true;
@@ -39,6 +49,13 @@ const handleSubmit = async () => {
     // 保存 tekon
     localStorage.setItem('SOY_token', res.data.token);
     localStorage.setItem('SOY_refreshToken', res.data.refreshToken);
+
+    if (rememberMe.value) {
+      localStorage.setItem('rememberUserName', model.userName);
+    } else {
+      localStorage.removeItem('rememberUserName');
+    }
+
     const redirectPath = route.query.redirect as string;
     router.replace(redirectPath || '/manage/browseData');
     // 跳转路由
@@ -48,6 +65,7 @@ const handleSubmit = async () => {
 };
 
 const toggleLoginModule = () => {
+  message.success('请联系开发者！');
 };
 </script>
 
@@ -70,10 +88,10 @@ const toggleLoginModule = () => {
             </NFormItem>
             <NSpace vertical :size="24">
               <div class="flex items-center justify-between">
-                <NCheckbox>记住我</NCheckbox>
-                <NButton quaternary @click="toggleLoginModule()">
+                <NCheckbox v-model:checked="rememberMe">记住我</NCheckbox>
+                <div @click="toggleLoginModule()">
                   忘记密码？
-                </NButton>
+                </div>
               </div>
               <NButton type="primary" size="large" round block :loading="loginLoading" @click="handleSubmit">
                 确定

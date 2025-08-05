@@ -4,6 +4,7 @@
  * @param {Egg.EggAppInfo} appInfo app info
  */
 
+const path = require('path');
 const os = require('os');
 // 获取本机ip
 function getIpAddress() {
@@ -32,7 +33,6 @@ module.exports = appInfo => {
       // 单数据库信息配置
       client: {
         host: myHost,
-        // host: '1Panel-mysql-6eiz', // 容器启动的情况下，用容器的名称
         port: '3306',
         // 用户名
         user: 'root',
@@ -46,6 +46,7 @@ module.exports = appInfo => {
       // 是否加载到 agent 上，默认关闭
       agent: false,
     },
+    // 集群配置
     cluster: {
       listen: {
         path: '',
@@ -58,6 +59,7 @@ module.exports = appInfo => {
     jwt: {
       secret: 's0m3V3ry$ecur3Str1ng!2025',
     },
+    // 关闭 CSRF 校验
     security: {
       csrf: {
         enable: false, // 关闭 CSRF 校验
@@ -78,13 +80,25 @@ module.exports = appInfo => {
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
   };
 
+  config.multipart = {
+    whitelist: [ '.jpg', '.jpeg', '.png', '.xls', '.xlsx', '.txt', '.pdf', '.doc', '.docx', '.zip', '.rar' ],
+    // ✅ 允许中文文件名
+    checkFile(filename) {
+      // 只检查扩展名，不检查文件名是否包含中文
+      const extname = path.extname(filename).toLowerCase();
+      return this.whitelist.includes(extname);
+    },
+  };
+
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',
+    fileServerPath: '/Users/sujunhao/Downloads/user_file',
   };
 
   return {
     ...config,
-    ...userConfig,
+    userConfig,
   };
 };
+

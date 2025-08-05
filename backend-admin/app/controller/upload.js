@@ -1,9 +1,10 @@
 const { Controller } = require('egg');
 
 class UploadController extends Controller {
-  async list() {
+  async file() {
     const { ctx, service } = this;
-    const result = await service.upload.upload_image(ctx.request.body);
+    const stream = await ctx.getFileStream(); // ✅ 只在这里读取一次 multipart
+    const result = await service.upload.file(stream, ctx); // ✅ 把 stream 传下去
     ctx.body = result;
   }
 }

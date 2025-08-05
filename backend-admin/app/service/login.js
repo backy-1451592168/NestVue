@@ -77,7 +77,7 @@ class UserService extends Service {
     const token = jwt.sign(
       { data: { userName: user.user_name } },
       jwtSecret,
-      { expiresIn: '10s' } // token 有效期 1 小时
+      { expiresIn: '1h' } // token 有效期 1 小时
     );
     /**
       作用：当 token 过期后，用它来换取新的 token，避免用户频繁重新登录。
@@ -124,7 +124,7 @@ class UserService extends Service {
       const newToken = jwt.sign(
         { data: decoded.data },
         jwtSecret,
-        { expiresIn: '10s' }
+        { expiresIn: '1h' }
       );
       return {
         code: 200,

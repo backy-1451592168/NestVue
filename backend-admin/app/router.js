@@ -22,4 +22,7 @@ module.exports = app => {
   router.post('/holiday/update', controller.holiday.update);
   // 删除纪念日
   router.post('/holiday/delete', controller.holiday.delete);
+
+  // 通用上传文件
+  router.post('/upload/file', controller.upload.file);
 };

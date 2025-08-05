@@ -1,51 +1,51 @@
 const fs = require('fs');
 const path = require('path');
-const multer = require('multer');
+const sendToWormhole = require('stream-wormhole');
 
-/**
- * 创建通用上传中间件
- * @param {Object} options
- * @param {string} options.basePath - 基础存储路径，例如 userConfig.fileServerPath
- * @param {string[]} options.allowedTypes - 允许的文件类型，例如 ['image/jpeg', 'image/png']
- * @param {string} [options.subFolder] - 子文件夹名称（可选），例如按类型区分（images、videos）
-*/
+async function handleUpload(stream, options) {
+  const { basePath, allowedTypes, subFolder = '' } = options;
 
-const createUploader = (basePath, allowedTypes, subFolder = '') => {
-  const storage = multer.diskStorage({
-    destination(req, file, cb) {
-      const currentDate = new Date();
-      const year = currentDate.getFullYear();
-      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-      const day = currentDate.getDate().toString().padStart(2, '0');
-      const dateFolder = `${year}${month}${day}`;
-      // 目标存储路径
-      const uploadPath = path.join(basePath, subFolder, dateFolder);
-      // 判断文件夹是否存在，不存在则创建
-      if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath, { recursive: true });
-      }
+  if (!stream || !stream.filename || !stream.mimeType) {
+    return {
+      success: false,
+      message: '请选择要上传的文件',
+    };
+  }
 
-      cb(null, uploadPath);
-    },
-    filename(req, file, cb) {
-      const ext = path.extname(file.originalname);
-      cb(null, `${Date.now()}${ext}`);
-    },
-  });
+  if (!allowedTypes.includes(stream.mimeType)) {
+    await sendToWormhole(stream);
+    return {
+      success: false,
+      message: '不支持的文件类型',
+    };
+  }
 
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const dateFolder = `${year}${month}${day}`;
+  const folderPath = path.join(basePath, subFolder, dateFolder);
+  fs.mkdirSync(folderPath, { recursive: true });
 
-  return multer({
-    storage,
-    fileFilter: (req, file, cb) => {
-      if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-      } else {
-        cb(new Error('文件类型不被允许'));
-      }
-    },
-    // 可根据需要添加大小限制
-    // limits: { fileSize: 10 * 1024 * 1024 }
-  });
-};
+  const filename = `${Date.now()}_${stream.filename}`;
+  const targetPath = path.join(folderPath, filename);
+  const writeStream = fs.createWriteStream(targetPath);
 
-module.exports = createUploader;
+  try {
+    await stream.pipe(writeStream);
+    return {
+      success: true,
+      message: '上传成功',
+      url: path.join('/user_file', subFolder, dateFolder, filename),
+    };
+  } catch (err) {
+    await sendToWormhole(stream);
+    return {
+      success: false,
+      message: '文件保存失败',
+    };
+  }
+}
+
+module.exports = handleUpload;
